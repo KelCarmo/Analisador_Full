@@ -5,6 +5,7 @@
         <group>
             <file>file:/home/kocarmo/Documentos/Analisador_Full/CompilaTest/src/model/uefs/br/Analisador.java</file>
             <file>file:/home/kocarmo/Documentos/Analisador_Full/CompilaTest/src/model/uefs/br/teste.java</file>
+            <file>file:/home/kocarmo/Documentos/Analisador_Full/CompilaTest/src/model/uefs/br/Token.java</file>
             <file>file:/home/kocarmo/Documentos/Analisador_Full/CompilaTest/src/model/uefs/br/A_Sintatica.java</file>
             <file>file:/home/kocarmo/Documentos/Analisador_Full/CompilaTest/src/model/uefs/br/ReadWriteArq.java</file>
         </group>

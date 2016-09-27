@@ -33,8 +33,8 @@ public class A_Sintatica {
             DEC();
             delaracao_var_global();
         }
-        else{
-            System.err.print("SYNTAX.ERROR!!!");
+        else{//Produção Vazia
+            return;
         }
         
        
@@ -96,8 +96,8 @@ public class A_Sintatica {
         }else{
             if(token.getTipo() == 9 || token.getTipo() ==10){
                 lerProximoToken();                
-            }else{
-                //ERRO"
+            }else{//Produção vazia
+                return;
             }
         }
     }
@@ -111,8 +111,8 @@ public class A_Sintatica {
         if(token.getNome().equals("e") || token.getNome().equals("ou")){
             lerProximoToken();
             expressao_booleana();
-        }else{
-            //ERRO!
+        }else{//Produção vazia
+            return;
         }
     }
     
@@ -190,8 +190,8 @@ public class A_Sintatica {
         if(token.getNome().equals("(")){
             lerProximoToken();
             aux_valor2();
-        }else{
-            //ERRO!
+        }else{//Produção vazia
+            return;
         }
     }    
     public static void aux_valor2(){
@@ -230,7 +230,84 @@ public class A_Sintatica {
     }
     
     public static void parametro(){
-        
+        if(token.getTipo() == 9){
+            lerProximoToken();
+            R();
+        }else{
+            if(token.getNome().equals("nao") ||token.getNome().equals("-") || token.getTipo()==2 || token.getTipo()==3 || token.getNome().equals("(") || 
+                    token.getNome().equals("verdadeiro") || token.getNome().equals("falso")){
+                expressao_booleana();
+                R();
+            }else{
+                if(token.getTipo() == 10){
+                    lerProximoToken();
+                    R();
+                }
+                else{//Produção vazia
+                    return;
+                }
+            }
+        }
+    }
+    
+    public static void R(){
+        if(token.getNome().equals(",")){
+            lerProximoToken();
+            parametro();
+        }else{//Produção vazia
+            return;
+        }
+    }
+    
+    public static void Attr(){
+        id();
+        aux_valor1();
+        AttR1();
+    }
+    
+    public static void AttR1(){
+        if(token.getNome().equals("=")){
+            lerProximoToken();
+            AttR2();
+        }else{
+            if(token.getNome().equals(";")){
+                lerProximoToken();
+            }else{
+                //ERRO
+            }
+        }
+    }
+    
+    public static void AttR2(){
+        if(token.getNome().equals("-") || token.getTipo()==2 || token.getTipo()==3 || token.getNome().equals("(") || 
+                    token.getNome().equals("verdadeiro") || token.getNome().equals("falso")){
+            expressao_aritmetica();
+            if(token.getNome().equals(";")){
+                lerProximoToken();
+            }else{
+                //Erro
+            }
+        }else{
+            if(token.getTipo() == 9){
+                lerProximoToken();
+                if(token.getNome().equals(";")){
+                    lerProximoToken();
+                }else{
+                    //ERRO
+                }
+            }else{
+                if(token.getTipo() == 10){
+                    lerProximoToken();
+                    if(token.getNome().equals(";")){
+                    lerProximoToken();
+                    }else{
+                        //ERRO
+                    }
+                }else{
+                    //ERRO
+                }
+            }
+        }
     }
     
     public static void aux_valor4(){
@@ -247,15 +324,88 @@ public class A_Sintatica {
                     }
                 }
             }
+        }else{//Produção vazia
+            return;
         }            
     }
+    
+    public static void Enquanto(){
+        if(token.getNome().equals("equanto")){
+            lerProximoToken();
+            if(token.getNome().equals("(")){
+            lerProximoToken();
+            expressao_booleana();
+            if(token.getNome().equals(")")){
+                lerProximoToken();
+                if(token.getNome().equals("faca")){
+                    lerProximoToken();
+                    bloco_de_codigo();
+                }else{
+                    //ERRO
+                }
+            }else{
+                //ERRO
+            }
+            }else{
+                //ERRO
+            }
+        }else{
+            //ERRO
+        }
+    }
+    
+    public static void se_entao_senao(){
+        if(token.getNome().equals("se")){
+            lerProximoToken();
+            if(token.getNome().equals("(")){
+                lerProximoToken();
+                expressao_booleana();
+                if(token.getNome().equals(")")){
+                    lerProximoToken();
+                    if(token.getNome().equals("entao")){
+                        lerProximoToken();
+                        bloco_de_codigo();
+                        SE();
+                    }else{
+                        //ERRO
+                    }
+                }else{
+                    //ERRO
+                }
+            }else{
+                //ERRO
+            }
+        }else{
+            //ERRO
+        }                
+    }
+    
+    public static void SE(){
+        if(token.getNome().equals("senao")){
+            NEGACAO();
+        }else{//Produção vazia
+           return;
+        }
+    }
+    
+    public static void NEGACAO(){
+        if(token.getNome().equals("senao")){
+            lerProximoToken();
+            bloco_de_codigo();
+        }
+        else{
+            //ERRO
+        }
+    }
+    
+    
     
     public static void Mult_ExpR(){
         if(token.getNome().equals("*") || token.getNome().equals("/")){
             lerProximoToken();
             Mult_Exp();
-        }else{
-            //ERRO
+        }else{//Produção vazia
+            return;
         }
     }
     
@@ -264,8 +414,8 @@ public class A_Sintatica {
         if(token.getNome().equals("+") || token.getNome().equals("-")){
             lerProximoToken();
             expressao_aritmetica();
-        }else{
-            //ERRO
+        }else{//Produção vazia
+            return;
         }
     }
     public static void Aux_ExpressionR(){
@@ -273,8 +423,8 @@ public class A_Sintatica {
                 || token.getNome().equals("=") || token.getNome().equals("<>")){
             lerProximoToken();
             Aux_Expression();
-        }else{
-            //ERRO!
+        }else{//Produção vazia
+            return;
         }
     }
     
@@ -285,10 +435,18 @@ public class A_Sintatica {
     public static void parametro_programa(){/*DEU MERDA*/
        if(token.getNome().equals("inteiro") || token.getNome().equals("cadeia") || token.getNome().equals("real") || token.getNome().equals("booleano") || token.getNome().equals("caractere")){
             id();
-            parametro3();
+            X();
         }else{
-           
+           return;//Produção vazia
        }
+    }
+    
+    public static void X(){
+         if(token.getNome().equals(",")){
+             parametro3();
+         }else{//Produção vazia
+             return;
+         }
     }
     
     public static void parametro3(){
@@ -301,12 +459,20 @@ public class A_Sintatica {
     }
     
     public static void funcoes(){
-        Funcao();
-        FX();
+        if(token.getNome().equals("funcao")){
+            Funcao();
+            FX();
+        }else{
+            return;//Produção vazia
+        }
     }
     
     public static void FX(){
-        Funcao();
+        if(token.getNome().equals("funcao")){
+            Funcao();
+        }else{//Produção Vazia
+            return;
+        }
     }
     
     public static void DEC_CONST(){
@@ -335,16 +501,72 @@ public class A_Sintatica {
     }
     
      public static void id(){
-        if(token.getTipo() == 2) {
-            id();
+        if(token.getTipo() == 2) {            
             lerProximoToken();
         }
-        else ;//ERRO
-        
+        else {
+            //ERRO
+        }
     }
      
      public static void DEC(){
-         
+         if(token.getNome().equals("var")){
+             lerProximoToken();
+             tipo();
+             id();
+             A();
+             V1();
+             if(token.getNome().equals(";")){
+                 lerProximoToken();
+             }else{
+                 //ERRO
+             }
+         }else{
+             //ERRO
+         }
+     }
+     
+     public static void V1(){
+         if(token.getNome().equals(",")){
+             lerProximoToken();
+             id();
+             A();
+             V1();
+             
+         }else{//Produção vazia
+             return;
+         }
+     }
+     
+     public static void A(){
+         if(token.getNome().equals("(")){
+             lerProximoToken();
+             if(token.getNome().equals("(")){
+                 lerProximoToken();
+                 if(token.getTipo() == 3){
+                     lerProximoToken();
+                     if(token.getNome().equals(")")){
+                          lerProximoToken();
+                        if(token.getNome().equals(")")){
+                            lerProximoToken();
+                            A();
+                        }else{
+                            //ERRO
+                        }
+                 }else{
+                        //ERRO 
+                     }
+                                
+             }else{
+                     //ERRO
+                 }
+            
+         }else{
+                //ERRO 
+             }
+     }else{//Produção vazia
+             return;
+         }
      }
      
      public static void DEC_CONST2(){         

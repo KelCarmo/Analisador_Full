@@ -36,6 +36,7 @@ public class A_Sintatica {
         else{
             System.err.print("SYNTAX.ERROR!!!");
         }
+        
        
     }
     
@@ -89,15 +90,214 @@ public class A_Sintatica {
     }
     
     public static void RETORNO(){
+        if(token.getNome().equals("nao") || token.getNome().equals("-") || token.getTipo()==2 ||
+                token.getTipo()==3 || token.getNome().equals("(") || token.getNome().equals("verdadeiro") || token.getNome().equals("falso")){
+            expressao_booleana();                                    
+        }else{
+            if(token.getTipo() == 9 || token.getTipo() ==10){
+                lerProximoToken();                
+            }else{
+                //ERRO"
+            }
+        }
+    }
+    
+    public static void expressao_booleana(){
+        Aux_Expression();
+        expressao_booleanaR();
+    }
+    
+    public static void  expressao_booleanaR(){
+        if(token.getNome().equals("e") || token.getNome().equals("ou")){
+            lerProximoToken();
+            expressao_booleana();
+        }else{
+            //ERRO!
+        }
+    }
+    
+    public static void Aux_Expression(){
+        nao_expressao_aritmetica();
+        Aux_ExpressionR();
+    }
+    
+    public static void nao_expressao_aritmetica(){
+        if(token.getNome().equals("nao")){
+            lerProximoToken();
+            expressao_aritmetica();
+        }else{
+            if(token.getNome().equals("-") || token.getTipo()==2 || token.getTipo()==3 || token.getNome().equals("(") || 
+                    token.getNome().equals("verdadeiro") || token.getNome().equals("falso")){
+                expressao_aritmetica();
+            }else{
+                //ERRO!
+            }
+        }
+    }
+    
+    public static void expressao_aritmetica(){
+        Mult_Exp();
+        expressao_artimeticaR();
         
+    }
+    public static void Mult_Exp(){
+        Neg_Exp();
+        Mult_ExpR();
+    }
+    
+    public static void Neg_Exp(){
+        if(token.getNome().equals("-")){
+            lerProximoToken();
+            Valor();
+        }else{
+            if(token.getTipo()==2 || token.getTipo()==3 || token.getNome().equals("(") || 
+                    token.getNome().equals("verdadeiro") || token.getNome().equals("falso")){
+                Valor();
+            }else{
+                //ERRO
+            }
+        }
+    }
+    
+    public static void Valor(){
+        if(token.getTipo()==2){
+            id();
+            aux_valor1();
+        }else{
+            if(token.getTipo()==3){
+                lerProximoToken();
+            }else{
+                if(token.getNome().equals("(")){
+                    lerProximoToken();
+                    expressao_booleana();
+                    if(token.getNome().equals(")")){
+                        lerProximoToken();
+                    }else{
+                        //ERRO!
+                    }
+                }else{
+                    if(token.getNome().equals("verdadeiro") || token.getNome().equals("falso")){
+                        lerProximoToken();
+                    }else{
+                        //ERRO
+                    }
+                }
+            }
+    }
+    }
+    
+    public static void aux_valor1(){
+        if(token.getNome().equals("(")){
+            lerProximoToken();
+            aux_valor2();
+        }else{
+            //ERRO!
+        }
+    }    
+    public static void aux_valor2(){
+        if(token.getNome().equals("(")){
+            lerProximoToken();
+            aux_valor3();
+        }else{
+            if(token.getTipo() == 9 || token.getNome().equals("nao") ||token.getNome().equals("-") || token.getTipo()==2 || token.getTipo()==3 || token.getNome().equals("(") || 
+                    token.getNome().equals("verdadeiro") || token.getNome().equals("falso") || token.getTipo() == 10){
+                parametro();
+                if(token.getNome().equals(")")){
+                    lerProximoToken();
+                }else{
+                    //ERRO
+                }
+                
+            }else{
+                //ERRO
+            }
+        }
+    }
+    
+    public static void aux_valor3(){
+        Valor();
+        if(token.getNome().equals(")")){
+            lerProximoToken();
+            if(token.getNome().equals(")")){
+               lerProximoToken();
+               aux_valor4();
+            }else{
+                //ERRO
+            }
+        }else{
+            //ERRO
+        }
+    }
+    
+    public static void parametro(){
+        
+    }
+    
+    public static void aux_valor4(){
+        if(token.getNome().equals("(")){
+            lerProximoToken();
+            if(token.getNome().equals("(")){
+                lerProximoToken();
+                Valor();
+                if(token.getNome().equals(")")){
+                    lerProximoToken();
+                    if(token.getNome().equals(")")){
+                        lerProximoToken();
+                        aux_valor4();
+                    }
+                }
+            }
+        }            
+    }
+    
+    public static void Mult_ExpR(){
+        if(token.getNome().equals("*") || token.getNome().equals("/")){
+            lerProximoToken();
+            Mult_Exp();
+        }else{
+            //ERRO
+        }
+    }
+    
+    
+    public static void expressao_artimeticaR(){
+        if(token.getNome().equals("+") || token.getNome().equals("-")){
+            lerProximoToken();
+            expressao_aritmetica();
+        }else{
+            //ERRO
+        }
+    }
+    public static void Aux_ExpressionR(){
+        if(token.getNome().equals(">") || token.getNome().equals("<") || token.getNome().equals("<=") || token.getNome().equals(">=")
+                || token.getNome().equals("=") || token.getNome().equals("<>")){
+            lerProximoToken();
+            Aux_Expression();
+        }else{
+            //ERRO!
+        }
     }
     
     public static void BXR(){
         
     }
     
-    public static void parametro_programa(){
-        
+    public static void parametro_programa(){/*DEU MERDA*/
+       if(token.getNome().equals("inteiro") || token.getNome().equals("cadeia") || token.getNome().equals("real") || token.getNome().equals("booleano") || token.getNome().equals("caractere")){
+            id();
+            parametro3();
+        }else{
+           
+       }
+    }
+    
+    public static void parametro3(){
+        if(token.getNome().equals(",")){
+            lerProximoToken();
+            parametro_programa();
+        }else{
+            //ERRO
+        }
     }
     
     public static void funcoes(){

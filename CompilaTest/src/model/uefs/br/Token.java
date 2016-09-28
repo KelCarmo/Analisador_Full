@@ -20,6 +20,7 @@ public class Token {
      private int linha;
     private boolean status;
     
+    
     public Token(String nome, int tipo, int linha, String expressaoRegular){
         this.nome = nome;
         this.tipo = tipo;
@@ -34,7 +35,10 @@ public class Token {
         this.status = status;
     }
    
-
+    /**
+     * Função que retorna o status do token, se está correto ou incorreto
+     * @return status
+     */
     public boolean isStatus() {
         return status;
     }
@@ -105,8 +109,12 @@ public class Token {
         if(this.status)
         return linha + "|" + nome + "|" + getNomeTipos(tipo);
         else {
-            if(tipo == 11) return linha + "|" + nome + "|" + "Contém Caracteres Desconhecido pelo alfabeto da linguagem";
-            return linha + "|" + nome + "|" + getNomeTipos(tipo) + " mal formado!";
+            if(tipo == 11) {
+                return linha + "|" + nome + "|" + "Contém Caracteres Desconhecido pelo alfabeto da linguagem";
+            }
+            else {
+                return linha + "|" + nome + "|" + getNomeTipos(tipo) + " mal formado!";
+            }
         }
     }
     

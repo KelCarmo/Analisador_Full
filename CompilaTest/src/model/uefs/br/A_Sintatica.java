@@ -5,33 +5,61 @@
  */
 package model.uefs.br;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author kocarmo
  */
 public class A_Sintatica {
     
-    private String cadeia;
-    private static Token token;
     
-    public static void Program(){
-        delaracao_var_global();
-        delaracao_programa();
+    private static  int index;
+    private static ArrayList<Token> tokens;
+    private static Token current ;
+    
+    
+    public static void analisarSintaxe(ArrayList<Token> tokens){
+        A_Sintatica.tokens = tokens;
+        A_Sintatica.index = 0;
+        A_Sintatica.current = tokens.get(index);
+        
+        Program();
+    }
+    
+    
+    private static void Program(){
+        declaracao_var_global();
+        declaracao_programa();
         funcoes();
     }
     
-    public static void lerProximoToken(){
-        
+    private static void ERRO(){
+        int a = 0;
+        while(true){
+            if(a == 0) {
+                System.err.print("ERRO !!! Token nao esperado: " + A_Sintatica.current.getNome() + A_Sintatica.current.getLinha());
+            a=1;
+        }
+        }
     }
     
-    public static void delaracao_var_global(){
-        if(token.getNome().equals("const")) {
+    private static void lerProximoToken(){
+              A_Sintatica.index++;
+              
+      current = tokens.get(index);
+      
+    
+    }
+    
+    private static void declaracao_var_global(){
+        if(current.getNome().equals("const")) {
             DEC_CONST();
-            delaracao_var_global();
+            declaracao_var_global();
         }
-        else if(token.getNome().equals("var")){
+        else if(current.getNome().equals("var")){
             DEC();
-            delaracao_var_global();
+            declaracao_var_global();
         }
         else{//Produção Vazia
             return;
@@ -40,61 +68,61 @@ public class A_Sintatica {
        
     }
     
-    public static void delaracao_programa(){
-        if(token.getNome().equals("programa")){
+    private static void declaracao_programa(){
+        if(current.getNome().equals("programa")){
             lerProximoToken();
             tipo();
             id();
-            if(token.getNome().equals("(")){
+            if(current.getNome().equals("(")){
                 lerProximoToken();
                 parametro_programa();
-                if(token.getNome().equals(")")){
+                if(current.getNome().equals(")")){
                     lerProximoToken();
-                    if(token.getNome().equals("inicio")){
+                    if(current.getNome().equals("inicio")){
                         lerProximoToken();
                         BXR();
-                        if(token.getNome().equals("fim")){
+                        if(current.getNome().equals("fim")){
                             lerProximoToken();
-                            if(token.getNome().equals("(")){
+                            if(current.getNome().equals("(")){
                                 lerProximoToken();
                                 RETORNO();
-                                if(token.getNome().equals(")")){
+                                if(current.getNome().equals(")")){
                                     lerProximoToken();
-                                    if(token.getNome().equals(";")){
+                                    if(current.getNome().equals(";")){
                                         lerProximoToken();
                                     }else{
-                                        //ERRO
+                                        ERRO();
                                     }
                                 }else{
-                                    //ERRO
+                                    ERRO();
                                 }
                             }else{
-                                //ERRO
+                                ERRO();
                             }
                         }else{
-                            //ERRO
+                            ERRO();
                         }
                     }else{
-                        //ERRO
+                        ERRO();
                     }
                 }else{
-                    //ERRO
+                    ERRO();
                 }
             }else{
-                //ERRO
+                ERRO();
             }
             
         }else {
-            //Erro
+            ERRO();
         }
     }
     
-    public static void RETORNO(){
-        if(token.getNome().equals("nao") || token.getNome().equals("-") || token.getTipo()==2 ||
-                token.getTipo()==3 || token.getNome().equals("(") || token.getNome().equals("verdadeiro") || token.getNome().equals("falso")){
+    private static void RETORNO(){
+        if(current.getNome().equals("nao") || current.getNome().equals("-") || current.getTipo()==2 ||
+                current.getTipo()==3 || current.getNome().equals("(") || current.getNome().equals("verdadeiro") || current.getNome().equals("falso")){
             expressao_booleana();                                    
         }else{
-            if(token.getTipo() == 9 || token.getTipo() ==10){
+            if(current.getTipo() == 9 || current.getTipo() ==10){
                 lerProximoToken();                
             }else{//Produção vazia
                 return;
@@ -102,13 +130,13 @@ public class A_Sintatica {
         }
     }
     
-    public static void expressao_booleana(){
+    private static void expressao_booleana(){
         Aux_Expression();
         expressao_booleanaR();
     }
     
-    public static void  expressao_booleanaR(){
-        if(token.getNome().equals("e") || token.getNome().equals("ou")){
+    private static void  expressao_booleanaR(){
+        if(current.getNome().equals("e") || current.getNome().equals("ou")){
             lerProximoToken();
             expressao_booleana();
         }else{//Produção vazia
@@ -116,130 +144,130 @@ public class A_Sintatica {
         }
     }
     
-    public static void Aux_Expression(){
+    private static void Aux_Expression(){
         nao_expressao_aritmetica();
         Aux_ExpressionR();
     }
     
-    public static void nao_expressao_aritmetica(){
-        if(token.getNome().equals("nao")){
+    private static void nao_expressao_aritmetica(){
+        if(current.getNome().equals("nao")){
             lerProximoToken();
             expressao_aritmetica();
         }else{
-            if(token.getNome().equals("-") || token.getTipo()==2 || token.getTipo()==3 || token.getNome().equals("(") || 
-                    token.getNome().equals("verdadeiro") || token.getNome().equals("falso")){
+            if(current.getNome().equals("-") || current.getTipo()==2 || current.getTipo()==3 || current.getNome().equals("(") || 
+                    current.getNome().equals("verdadeiro") || current.getNome().equals("falso")){
                 expressao_aritmetica();
             }else{
-                //ERRO!
+                ERRO();
             }
         }
     }
     
-    public static void expressao_aritmetica(){
+    private static void expressao_aritmetica(){
         Mult_Exp();
         expressao_artimeticaR();
         
     }
-    public static void Mult_Exp(){
+    private static void Mult_Exp(){
         Neg_Exp();
         Mult_ExpR();
     }
     
-    public static void Neg_Exp(){
-        if(token.getNome().equals("-")){
+    private static void Neg_Exp(){
+        if(current.getNome().equals("-")){
             lerProximoToken();
             Valor();
         }else{
-            if(token.getTipo()==2 || token.getTipo()==3 || token.getNome().equals("(") || 
-                    token.getNome().equals("verdadeiro") || token.getNome().equals("falso")){
+            if(current.getTipo()==2 || current.getTipo()==3 || current.getNome().equals("(") || 
+                    current.getNome().equals("verdadeiro") || current.getNome().equals("falso")){
                 Valor();
             }else{
-                //ERRO
+                ERRO();
             }
         }
     }
     
-    public static void Valor(){
-        if(token.getTipo()==2){
+    private static void Valor(){
+        if(current.getTipo()==2){
             id();
             aux_valor1();
         }else{
-            if(token.getTipo()==3){
+            if(current.getTipo()==3){
                 lerProximoToken();
             }else{
-                if(token.getNome().equals("(")){
+                if(current.getNome().equals("(")){
                     lerProximoToken();
                     expressao_booleana();
-                    if(token.getNome().equals(")")){
+                    if(current.getNome().equals(")")){
                         lerProximoToken();
                     }else{
-                        //ERRO!
+                        ERRO();
                     }
                 }else{
-                    if(token.getNome().equals("verdadeiro") || token.getNome().equals("falso")){
+                    if(current.getNome().equals("verdadeiro") || current.getNome().equals("falso")){
                         lerProximoToken();
                     }else{
-                        //ERRO
+                        ERRO();
                     }
                 }
             }
     }
     }
     
-    public static void aux_valor1(){
-        if(token.getNome().equals("(")){
+    private static void aux_valor1(){
+        if(current.getNome().equals("(")){
             lerProximoToken();
             aux_valor2();
         }else{//Produção vazia
             return;
         }
     }    
-    public static void aux_valor2(){
-        if(token.getNome().equals("(")){
+    private static void aux_valor2(){
+        if(current.getNome().equals("(")){
             lerProximoToken();
             aux_valor3();
         }else{
-            if(token.getTipo() == 9 || token.getNome().equals("nao") ||token.getNome().equals("-") || token.getTipo()==2 || token.getTipo()==3 || token.getNome().equals("(") || 
-                    token.getNome().equals("verdadeiro") || token.getNome().equals("falso") || token.getTipo() == 10){
+            if(current.getTipo() == 9 || current.getNome().equals("nao") ||current.getNome().equals("-") || current.getTipo()==2 || current.getTipo()==3 || current.getNome().equals("(") || 
+                    current.getNome().equals("verdadeiro") || current.getNome().equals("falso") || current.getTipo() == 10){
                 parametro();
-                if(token.getNome().equals(")")){
+                if(current.getNome().equals(")")){
                     lerProximoToken();
                 }else{
-                    //ERRO
+                    ERRO();
                 }
                 
             }else{
-                //ERRO
+                ERRO();
             }
         }
     }
     
-    public static void aux_valor3(){
+    private static void aux_valor3(){
         Valor();
-        if(token.getNome().equals(")")){
+        if(current.getNome().equals(")")){
             lerProximoToken();
-            if(token.getNome().equals(")")){
+            if(current.getNome().equals(")")){
                lerProximoToken();
                aux_valor4();
             }else{
-                //ERRO
+                ERRO();
             }
         }else{
-            //ERRO
+            ERRO();
         }
     }
     
-    public static void parametro(){
-        if(token.getTipo() == 9){
+    private static void parametro(){
+        if(current.getTipo() == 9){
             lerProximoToken();
             R();
         }else{
-            if(token.getNome().equals("nao") ||token.getNome().equals("-") || token.getTipo()==2 || token.getTipo()==3 || token.getNome().equals("(") || 
-                    token.getNome().equals("verdadeiro") || token.getNome().equals("falso")){
+            if(current.getNome().equals("nao") ||current.getNome().equals("-") || current.getTipo()==2 || current.getTipo()==3 || current.getNome().equals("(") || 
+                    current.getNome().equals("verdadeiro") || current.getNome().equals("falso")){
                 expressao_booleana();
                 R();
             }else{
-                if(token.getTipo() == 10){
+                if(current.getTipo() == 10){
                     lerProximoToken();
                     R();
                 }
@@ -250,8 +278,8 @@ public class A_Sintatica {
         }
     }
     
-    public static void R(){
-        if(token.getNome().equals(",")){
+    private static void R(){
+        if(current.getNome().equals(",")){
             lerProximoToken();
             parametro();
         }else{//Produção vazia
@@ -259,66 +287,66 @@ public class A_Sintatica {
         }
     }
     
-    public static void Attr(){
+    private static void Attr(){
         id();
         aux_valor1();
         AttR1();
     }
     
-    public static void AttR1(){
-        if(token.getNome().equals("=")){
+    private static void AttR1(){
+        if(current.getNome().equals("=")){
             lerProximoToken();
             AttR2();
         }else{
-            if(token.getNome().equals(";")){
+            if(current.getNome().equals(";")){
                 lerProximoToken();
             }else{
-                //ERRO
+                ERRO();
             }
         }
     }
     
-    public static void AttR2(){
-        if(token.getNome().equals("-") || token.getTipo()==2 || token.getTipo()==3 || token.getNome().equals("(") || 
-                    token.getNome().equals("verdadeiro") || token.getNome().equals("falso")){
+    private static void AttR2(){
+        if(current.getNome().equals("-") || current.getTipo()==2 || current.getTipo()==3 || current.getNome().equals("(") || 
+                    current.getNome().equals("verdadeiro") || current.getNome().equals("falso")){
             expressao_aritmetica();
-            if(token.getNome().equals(";")){
+            if(current.getNome().equals(";")){
                 lerProximoToken();
             }else{
-                //Erro
+                ERRO();
             }
         }else{
-            if(token.getTipo() == 9){
+            if(current.getTipo() == 9){
                 lerProximoToken();
-                if(token.getNome().equals(";")){
+                if(current.getNome().equals(";")){
                     lerProximoToken();
                 }else{
-                    //ERRO
+                    ERRO();
                 }
             }else{
-                if(token.getTipo() == 10){
+                if(current.getTipo() == 10){
                     lerProximoToken();
-                    if(token.getNome().equals(";")){
+                    if(current.getNome().equals(";")){
                     lerProximoToken();
                     }else{
-                        //ERRO
+                        ERRO();
                     }
                 }else{
-                    //ERRO
+                    ERRO();
                 }
             }
         }
     }
     
-    public static void aux_valor4(){
-        if(token.getNome().equals("(")){
+    private static void aux_valor4(){
+        if(current.getNome().equals("(")){
             lerProximoToken();
-            if(token.getNome().equals("(")){
+            if(current.getNome().equals("(")){
                 lerProximoToken();
                 Valor();
-                if(token.getNome().equals(")")){
+                if(current.getNome().equals(")")){
                     lerProximoToken();
-                    if(token.getNome().equals(")")){
+                    if(current.getNome().equals(")")){
                         lerProximoToken();
                         aux_valor4();
                     }
@@ -329,79 +357,79 @@ public class A_Sintatica {
         }            
     }
     
-    public static void Enquanto(){
-        if(token.getNome().equals("equanto")){
+    private static void Enquanto(){
+        if(current.getNome().equals("enquanto")){
             lerProximoToken();
-            if(token.getNome().equals("(")){
+            if(current.getNome().equals("(")){
             lerProximoToken();
             expressao_booleana();
-            if(token.getNome().equals(")")){
+            if(current.getNome().equals(")")){
                 lerProximoToken();
-                if(token.getNome().equals("faca")){
+                if(current.getNome().equals("faca")){
                     lerProximoToken();
                     bloco_de_codigo();
                 }else{
-                    //ERRO
+                    ERRO();
                 }
             }else{
-                //ERRO
+                ERRO();
             }
             }else{
-                //ERRO
+                ERRO();
             }
         }else{
-            //ERRO
+           ERRO();
         }
     }
     
-    public static void se_entao_senao(){
-        if(token.getNome().equals("se")){
+    private static void se_entao_senao(){
+        if(current.getNome().equals("se")){
             lerProximoToken();
-            if(token.getNome().equals("(")){
+            if(current.getNome().equals("(")){
                 lerProximoToken();
                 expressao_booleana();
-                if(token.getNome().equals(")")){
+                if(current.getNome().equals(")")){
                     lerProximoToken();
-                    if(token.getNome().equals("entao")){
+                    if(current.getNome().equals("entao")){
                         lerProximoToken();
                         bloco_de_codigo();
                         SE();
                     }else{
-                        //ERRO
+                        ERRO();
                     }
                 }else{
-                    //ERRO
+                    ERRO();
                 }
             }else{
-                //ERRO
+                ERRO();
             }
         }else{
-            //ERRO
+            ERRO();
         }                
     }
     
-    public static void SE(){
-        if(token.getNome().equals("senao")){
+    private static void SE(){
+        if(current.getNome().equals("senao")){
             NEGACAO();
         }else{//Produção vazia
            return;
         }
     }
     
-    public static void NEGACAO(){
-        if(token.getNome().equals("senao")){
+    private static void NEGACAO(){
+        if(current.getNome().equals("senao")){
             lerProximoToken();
             bloco_de_codigo();
         }
         else{
-            //ERRO
+            ERRO();
         }
     }
     
     
     
-    public static void Mult_ExpR(){
-        if(token.getNome().equals("*") || token.getNome().equals("/")){
+    private static void Mult_ExpR(){
+        if(current.getNome().equals("*") || current.getNome().equals("/")){
             lerProximoToken();
             Mult_Exp();
         }else{//Produção vazia
@@ -410,17 +438,18 @@ public class A_Sintatica {
     }
     
     
-    public static void expressao_artimeticaR(){
-        if(token.getNome().equals("+") || token.getNome().equals("-")){
+    private static void expressao_artimeticaR(){
+        if(current.getNome().equals("+") || current.getNome().equals("-")){
             lerProximoToken();
             expressao_aritmetica();
         }else{//Produção vazia
             return;
         }
     }
-    public static void Aux_ExpressionR(){
-        if(token.getNome().equals(">") || token.getNome().equals("<") || token.getNome().equals("<=") || token.getNome().equals(">=")
-                || token.getNome().equals("=") || token.getNome().equals("<>")){
+    
+    private static void Aux_ExpressionR(){
+        if(current.getNome().equals(">") || current.getNome().equals("<") || current.getNome().equals("<=") || current.getNome().equals(">=")
+                || current.getNome().equals("=") || current.getNome().equals("<>")){
             lerProximoToken();
             Aux_Expression();
         }else{//Produção vazia
@@ -428,12 +457,64 @@ public class A_Sintatica {
         }
     }
     
-    public static void BXR(){
-        
+    private static void bloco_de_codigo(){
+        if(current.getNome().equals("inicio")){
+            lerProximoToken();
+            BXR();
+             if(current.getNome().equals("fim")){
+                 lerProximoToken();
+             }else{
+                 ERRO();
+             }
+        }else{
+            ERRO();
+        }
     }
     
-    public static void parametro_programa(){/*DEU MERDA*/
-       if(token.getNome().equals("inteiro") || token.getNome().equals("cadeia") || token.getNome().equals("real") || token.getNome().equals("booleano") || token.getNome().equals("caractere")){
+    private static void BXR(){
+        BX();
+        BXR2();
+    }
+    
+     private static void BXR2(){
+        if(current.getNome().equals("se") || current.getNome().equals("var")|| current.getTipo() == 2 || current.getNome().equals("enquanto")
+           || current.getNome().equals("leia") || current.getNome().equals("escreva")){
+            BXR();
+        }else{//Produção vazia
+            return;
+        }
+    }
+    
+    private static void BX(){
+        if(current.getNome().equals("se")){
+            se_entao_senao();
+        }else{
+            if(current.getNome().equals("var")){
+                DEC();
+            }else{
+                if(current.getTipo() == 2){
+                    Attr();
+                }else{
+                    if(current.getNome().equals("enquanto")){
+                        Enquanto();
+                    }else{
+                        if(current.getNome().equals("leia")){
+                            Leia();
+                        }else{
+                            if(current.getNome().equals("escreva")){
+                                Escreva();
+                            }else{
+                                ERRO();
+                            }
+                        }                        
+                    }
+                }
+            }
+        }
+    }
+    
+    private static void parametro_programa(){/*DEU MERDA*/
+       if(current.getNome().equals("inteiro") || current.getNome().equals("cadeia") || current.getNome().equals("real") || current.getNome().equals("booleano") || current.getNome().equals("caractere")){
             id();
             X();
         }else{
@@ -441,25 +522,25 @@ public class A_Sintatica {
        }
     }
     
-    public static void X(){
-         if(token.getNome().equals(",")){
+    private static void X(){
+         if(current.getNome().equals(",")){
              parametro3();
          }else{//Produção vazia
              return;
          }
     }
     
-    public static void parametro3(){
-        if(token.getNome().equals(",")){
+    private static void parametro3(){
+        if(current.getNome().equals(",")){
             lerProximoToken();
             parametro_programa();
         }else{
-            //ERRO
+            ERRO();
         }
     }
     
-    public static void funcoes(){
-        if(token.getNome().equals("funcao")){
+    private static void funcoes(){
+        if(current.getNome().equals("funcao")){
             Funcao();
             FX();
         }else{
@@ -467,67 +548,78 @@ public class A_Sintatica {
         }
     }
     
-    public static void FX(){
-        if(token.getNome().equals("funcao")){
+    private static void FX(){
+        if(current.getNome().equals("funcao")){
             Funcao();
         }else{//Produção Vazia
             return;
         }
     }
     
-    public static void DEC_CONST(){
-        if(token.getNome().equals("const")){
+    private static void DEC_CONST(){
+        if(current.getNome().equals("const")){
             lerProximoToken();
             tipo();
             id();
-            if(token.getNome().equals("=")) {
+            if(current.getNome().equals("=")) {
             lerProximoToken();
             DEC_CONST2();
-            if(token.getNome().equals(";")) lerProximoToken();
-            else ; //ERRO
+            if(current.getNome().equals(";")) {
+                lerProximoToken();
+            }else {
+                ERRO();
+            }
+        }else {
+            ERRO();
+            }
+        }else {
+            ERRO();
         }
-            else ;//ERRO
-        }else ;//EROO
         
          
     }
     
-    public static void tipo(){
-        if(token.getNome().equals("inteiro") || token.getNome().equals("cadeia") || token.getNome().equals("real") || token.getNome().equals("booleano") || token.getNome().equals("caractere")){
+    private static void tipo(){
+        if(current.getNome().equals("inteiro") || current.getNome().equals("cadeia") || current.getNome().equals("real") || current.getNome().equals("booleano") || current.getNome().equals("caractere")){
             lerProximoToken();
+            
         }
-        else ;//ERRO
+        else {
+            
+            ERRO();
+        }
         
     }
     
-     public static void id(){
-        if(token.getTipo() == 2) {            
+     private static void id(){
+        if(current.getTipo() == 2) {            
             lerProximoToken();
         }
         else {
-            //ERRO
+            ERRO();
         }
     }
      
-     public static void DEC(){
-         if(token.getNome().equals("var")){
+     private static void DEC(){
+         if(current.getNome().equals("var")){
              lerProximoToken();
+             //System.out.print("PASSEI AQUI!");
              tipo();
              id();
              A();
              V1();
-             if(token.getNome().equals(";")){
+             if(current.getNome().equals(";")){
                  lerProximoToken();
              }else{
-                 //ERRO
+                 ERRO();
              }
          }else{
-             //ERRO
+             ERRO();
          }
      }
      
-     public static void V1(){
-         if(token.getNome().equals(",")){
+     private static void V1(){
+         if(current.getNome().equals(",")){
              lerProximoToken();
              id();
              A();
@@ -538,44 +630,182 @@ public class A_Sintatica {
          }
      }
      
-     public static void A(){
-         if(token.getNome().equals("(")){
+     private static void A(){
+         if(current.getNome().equals("(")){
              lerProximoToken();
-             if(token.getNome().equals("(")){
+             if(current.getNome().equals("(")){
                  lerProximoToken();
-                 if(token.getTipo() == 3){
+                 if(current.getTipo() == 3){
                      lerProximoToken();
-                     if(token.getNome().equals(")")){
+                     if(current.getNome().equals(")")){
                           lerProximoToken();
-                        if(token.getNome().equals(")")){
+                        if(current.getNome().equals(")")){
                             lerProximoToken();
                             A();
                         }else{
-                            //ERRO
+                            ERRO();
                         }
                  }else{
-                        //ERRO 
+                        ERRO(); 
                      }
                                 
              }else{
-                     //ERRO
+                     ERRO();
                  }
             
          }else{
-                //ERRO 
+                ERRO();
              }
      }else{//Produção vazia
              return;
          }
      }
      
-     public static void DEC_CONST2(){         
-        if(token.getTipo()== 3 || token.getTipo() == 9 || token.getTipo()==10) lerProximoToken();
-        else ;//ERRO
+     private static void DEC_CONST2(){         
+        if(current.getTipo()== 3 || current.getTipo() == 9 || current.getTipo()==10) {
+            lerProximoToken();
+        }
+        else {
+            ERRO();
+        }
      }
      
-     public static void Funcao(){
+     private static void Funcao(){
+         if(current.getNome().equals("funcao")){
+             lerProximoToken();
+             tipo();
+             id();
+             if(current.getNome().equals("(")){
+                 lerProximoToken();
+                 D();
+                 if(current.getNome().equals(")")){
+                     lerProximoToken();
+                     if(current.getNome().equals("inicio")){
+                         lerProximoToken();
+                         BXR();
+                         if(current.getNome().equals("fim")){
+                             lerProximoToken();
+                             if(current.getNome().equals("(")){
+                                 lerProximoToken();
+                                 RETORNO();
+                                 if(current.getNome().equals(")")){
+                                     lerProximoToken();
+                                     if(current.getNome().equals(";")){
+                                         lerProximoToken();
+                                     }else{
+                                         ERRO();
+                                     }
+                                 }else{
+                                     ERRO();
+                                 }
+                             }else{
+                                 ERRO();
+                             }
+                         }else{
+                             ERRO();
+                         }
+                     }else{
+                         ERRO();
+                     }
+                 }else{
+                    ERRO();
+                 }
+             }else{
+                 ERRO();
+             }
+         }else{
+             ERRO();
+         }
+     }
+     
+     private static void D(){
+         tipo();
+         id();
+         D2();
+     }
+     
+     private static void D2(){
+         if(current.getNome().equals(",")){
+             Q();
+         }else{//Produção vazia
+             return;
+         }
+     }
+     
+      private static void Q(){
+         if(current.getNome().equals(",")){
+             lerProximoToken();
+             D();
+         }
+     }
+     
+     private static void EXPRESSAO(){
+         RETORNO();
+         if(current.getNome().equals(")")){
+             lerProximoToken();
+             if(current.getNome().equals(";")){
+                 lerProximoToken();
+             }else{
+                 ERRO();
+             }
+         }else{
+             ERRO();
+         }
+     }
+     
+     private static void Escreva(){
+         if(current.getNome().equals("escreva")){
+             lerProximoToken();
+             if(current.getNome().equals("(")){
+                 lerProximoToken();
+                 EXPRESSAO();
+             }else{
+                 ERRO();
+             }
+         }else{
+             ERRO();
+         }
+     }
+     
+     private static void Exp(){
+         id();
+         aux_valor4();
+         Exp2();
          
+     }
+     
+     private static void Exp2(){
+         if(current.getNome().equals(",")){
+            lerProximoToken();
+            Exp();            
+         }else{//Produção vazia
+             return;
+         }
+         
+     }
+     
+     private static void Leia(){
+         if(current.getNome().equals("leia")){
+             lerProximoToken();
+             if(current.getNome().equals("(")){
+                 lerProximoToken();
+                 Exp();
+                 if(current.getNome().equals(")")){
+                     lerProximoToken();
+                     if(current.getNome().equals(";")){
+                         lerProximoToken();
+                     }else{
+                         ERRO();
+                     }
+                 }else{
+                    ERRO();
+                 }
+             }else{
+                 ERRO();
+             }
+         }else{
+             ERRO();
+         }
      }
     
     

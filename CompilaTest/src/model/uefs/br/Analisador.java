@@ -64,9 +64,32 @@ public class Analisador {
         int tam = arquivo.getAbsolutePath().length();
         
         lerArq(arquivo.getAbsolutePath());
-        separaTokens();        
+        separaTokens();//Análise Léxica        
         ReadWriteArq.escreve(tokens,arquivo.getAbsolutePath().substring(0,tam-4) + "Result.txt");
+        if(isErroLexico()){
+            System.out.print("\n Erros Léxicos, verifique o arquivo de saída do seu código-fonte!!!");
+        }else{
+            try{
+            analiseSintatica(tokens);
+            } catch (IndexOutOfBoundsException e) {        
+        System.out.printf("Análise Sintática do Arquivo: " + "\u001B[34m" + arquivo.getName() + "\u001B[0m" + " está" + "\u001B[34m" + " Correta!!" + "\u001B[0m" + "\n",
+          e.getMessage());
+    }
+        }
 
+    }
+    
+    private boolean analiseSintatica(ArrayList<Token> tokens) throws IndexOutOfBoundsException{
+        A_Sintatica.analisarSintaxe(tokens);
+        
+        return true;
+    }
+    
+    private boolean isErroLexico(){
+        for (Token novo1 : tokens) {
+            if(!novo1.isStatus()) return true;                     
+        }
+        return false;
     }
     /**
      * Método responsável por separar todos os lexemas referentes a sua classe-token definidas pela linguagem

@@ -42,6 +42,11 @@ public class ReadWriteArq {
         }
         
         public static void escreve(ArrayList<Token> novo, String nome_arquivo){
+            boolean msg = true;
+        
+            for (Token novo1 : novo) {
+            if(!novo1.isStatus()) msg=false;                     
+        }
            linhas_arq.clear();
             try{			
 			
@@ -51,6 +56,7 @@ public class ReadWriteArq {
                                 br.newLine();  
                                
                             }
+                            if(msg) br.write("\n A análise léxica passou com SUCESSO !!!!!");
                         br.close();
                     }
 		}catch(IOException ioe){
